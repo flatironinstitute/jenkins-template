@@ -33,7 +33,7 @@ pipeline {
       }
       steps {
         sh 'g++ -v'
-        sh 'python -V'
+        sh 'pip3 -V'
       }
     }
   }
