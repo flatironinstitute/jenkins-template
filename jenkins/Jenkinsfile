@@ -6,7 +6,7 @@ pipeline {
     timeout(time: 1, unit: 'HOURS')
   }
   environment {
-    IMAGE = '$REGISTRY_PREFIX/$BUILD_TAG'
+    IMAGE = "$REGISTRY_PREFIX/$BUILD_TAG"
   }
   stages {
     stage('image') {
