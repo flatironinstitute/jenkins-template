@@ -1,5 +1,10 @@
 pipeline {
   agent none
+  options {
+    disableConcurrentBuilds()
+    buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
+    timeout(time: 1, unit: 'HOURS')
+  }
   environment {
     IMAGE = '$REGISTRY_PREFIX/$BUILD_TAG'
   }
