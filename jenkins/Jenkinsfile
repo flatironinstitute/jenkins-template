@@ -24,12 +24,10 @@ pipeline {
     stage('build') {
       agent {
         kubernetes {
-          yaml """
-            spec:
-              containers:
-              - name: main
-                image: $IMAGE
-          """
+	  containerTemplate {
+	    name 'main'
+	    image IMAGE
+	  }
           defaultContainer 'main'
         }
       }
