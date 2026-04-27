@@ -1,0 +1,37 @@
+pipeline {
+  agent none
+  environment {
+    IMAGE = '$REGISTRY_PREFIX/$BUILD_TAG'
+  }
+  stages {
+    stage('image') {
+      agent {
+        kubernetes {
+          inheritFrom 'podman'
+          defaultContainer 'main'
+        }
+      }
+      steps {
+        sh 'podman build -t $IMAGE jenkins'
+        sh 'podman push $IMAGE'
+      }
+    }
+    stage('build') {
+      agent {
+        kubernetes {
+          yaml '''
+            spec:
+              containers:
+              - name: main
+                image: $IMAGE
+          '''
+          defaultContainer 'main'
+        }
+      }
+      steps {
+        sh 'g++ -v'
+        sh 'python -V'
+      }
+    }
+  }
+}
