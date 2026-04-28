@@ -24,11 +24,11 @@ pipeline {
     stage('build') {
       agent {
         kubernetes {
-	  inheritFrom 'default'
-	  containerTemplate {
-	    name 'main'
-	    image IMAGE
-	  }
+          inheritFrom 'default'
+          containerTemplate {
+            name 'main'
+            image IMAGE
+          }
           defaultContainer 'main'
         }
       }
@@ -41,20 +41,20 @@ pipeline {
     stage('cuda') {
       agent {
         kubernetes {
-	  yaml '''
-	    spec:
-	      runtimeClassName: nvidia
-	      containers:
-		- name: main
-		  image: nvidia/cuda:12.9.1-cudnn-devel-ubuntu24.04
-		  command: [sleep]
-		  args: [99999]
-		  resources:
-		    limits:
-		      cpu: 2
-		      memory: 16Gi
-		      nvidia.com/gpu: 1
-	  '''
+          yaml '''
+            spec:
+              runtimeClassName: nvidia
+              containers:
+                - name: main
+                  image: nvidia/cuda:12.9.1-cudnn-devel-ubuntu24.04
+                  command: [sleep]
+                  args: [99999]
+                  resources:
+                    limits:
+                      cpu: 2
+                      memory: 16Gi
+                      nvidia.com/gpu: 1
+          '''
           defaultContainer 'main'
         }
       }
