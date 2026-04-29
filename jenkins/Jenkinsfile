@@ -45,11 +45,16 @@ pipeline {
           yaml '''
             spec:
               runtimeClassName: nvidia
+              imagePullSecrets:
+                - name: registry-auth
               containers:
                 - name: main
                   image: nvidia/cuda:12.9.1-cudnn-devel-ubuntu24.04
                   command: [sleep]
                   args: [99999]
+                  securityContext:
+                    runAsUser: 1000
+                    runAsGroup: 1000
                   resources:
                     limits:
                       cpu: 2
