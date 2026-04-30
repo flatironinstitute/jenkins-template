@@ -3,6 +3,7 @@ def call(String dockerfile = "Dockerfile", Closure body) {
   podTemplate(inheritFrom: 'podman') {
     node(POD_LABEL) {
       container('main') {
+        body.call()
         sh "podman build -t $IMAGE -f $dockerfile"
         sh "podman push $IMAGE"
       }
