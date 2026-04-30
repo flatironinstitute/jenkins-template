@@ -1,6 +1,6 @@
 def call(Map args, Closure body) {
   def context    = args.context ?: ".";
-  def dockerfile = args.dockerfile ?: "$context/Dockerfile";
+  def dockerfile = args.dockerfile ?: "Dockerfile";
   def tag        = args.tag ?: "";
   def cpus       = args.cpus ?: 4;
   def memory     = args.memory ?: "16Gi";
@@ -14,7 +14,7 @@ def call(Map args, Closure body) {
         checkout scm
       }
       container('main') {
-        sh "podman build -t $image -f $dockerfile $context"
+        sh "podman build -t $image -f $context/$dockerfile $context"
         sh "podman push $image"
       }
     }

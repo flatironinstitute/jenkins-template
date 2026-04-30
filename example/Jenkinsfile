@@ -5,7 +5,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
     timeout(time: 1, unit: 'HOURS')
   }
-  stages {
+  parallel {
     stage('cpu') {
       steps {
         buildPod(context: 'example') {
@@ -17,7 +17,7 @@ pipeline {
     }
     stage('cuda') {
       steps {
-        buildPod(context: 'example', dockerfile: 'Dockerfile-cuda') {
+        buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda') {
           sh 'nproc'
           sh 'nvidia-smi'
         }
