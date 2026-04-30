@@ -1,6 +1,6 @@
 def call(Map args, Closure body) {
-  def dockerfile = args.dockerfile ?: "Dockerfile";
   def context    = args.context ?: ".";
+  def dockerfile = args.dockerfile ?: "$context/Dockerfile";
   def tag        = args.tag ?: "";
   def cpus       = args.cpus ?: 4;
   def memory     = args.memory ?: "16Gi";

@@ -5,68 +5,22 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
     timeout(time: 1, unit: 'HOURS')
   }
-  environment {
-    IMAGE = "$REGISTRY_PREFIX/${JOB_NAME.toLowerCase()}:$BUILD_NUMBER"
-  }
   stages {
-    stage('image') {
-      agent {
-        kubernetes {
-          inheritFrom 'podman'
-          defaultContainer 'main'
-        }
-      }
+    stage('cpu') {
       steps {
-        sh 'podman build -t $IMAGE jenkins'
-        sh 'podman push $IMAGE'
-      }
-    }
-    stage('build') {
-      agent {
-        kubernetes {
-          inheritFrom 'default'
-          containerTemplate {
-            name 'main'
-            image IMAGE
-          }
-          defaultContainer 'main'
+        buildPod(context: 'example') {
+          sh 'nproc'
+          sh 'g++ -v'
+          sh 'pip3 -V'
         }
-      }
-      steps {
-        sh 'nproc'
-        sh 'g++ -v'
-        sh 'pip3 -V'
       }
     }
     stage('cuda') {
-      agent {
-        kubernetes {
-          inheritFrom 'jnlp'
-          yaml '''
-            spec:
-              runtimeClassName: nvidia
-              imagePullSecrets:
-                - name: registry-auth
-              containers:
-                - name: main
-                  image: nvidia/cuda:12.9.1-cudnn-devel-ubuntu24.04
-                  command: [sleep]
-                  args: [99999]
-                  securityContext:
-                    runAsUser: 1000
-                    runAsGroup: 1000
-                  resources:
-                    limits:
-                      cpu: 2
-                      memory: 16Gi
-                      nvidia.com/gpu: 1
-          '''
-          defaultContainer 'main'
-        }
-      }
       steps {
-        sh 'nproc'
-        sh 'nvidia-smi'
+        buildPod(context: 'example', dockerfile: 'Dockerfile-cuda') {
+          sh 'nproc'
+          sh 'nvidia-smi'
+        }
       }
     }
   }
