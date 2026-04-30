@@ -20,7 +20,7 @@ def call(Map args, Closure body) {
     }
   }
 
-  podTemplate(inheritFrom: 'default', yaml: """
+  podTemplate(inheritFrom: 'jnlp', yaml: """
     spec:
       runtimeClassName: ${gpus > 0 ? "nvidia" : ""}
       imagePullSecrets:
