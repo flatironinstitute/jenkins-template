@@ -7,9 +7,10 @@ def call(Map args, Closure body) {
   def gpus       = args.gpus ?: 0;
   String image = "$REGISTRY_PREFIX/${JOB_NAME.toLowerCase()}:$BUILD_NUMBER$tag"
 
-  podTemplate(inheritFrom: 'podman') {
+  podTemplate(inheritFrom: 'podman', showRawYaml: false) {
     node(POD_LABEL) {
       container('main') {
+        checkout scm
         sh "podman build -t $image -f $dockerfile $context"
         sh "podman push $image"
       }
@@ -39,6 +40,7 @@ def call(Map args, Closure body) {
     """) {
     node(POD_LABEL) {
       container('main') {
+        checkout scm
         body.call()
       }
     }
