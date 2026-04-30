@@ -1,9 +1,12 @@
-def call(String dockerfile = "Dockerfile", Closure body) {
-  def IMAGE = "$REGISTRY_PREFIX/${JOB_NAME.toLowerCase()}:$BUILD_NUMBER"
+def call(
+    String dockerfile = "Dockerfile",
+    String context = ".",
+    String tag = "",
+    Closure body) {
+  def IMAGE = "$REGISTRY_PREFIX/${JOB_NAME.toLowerCase()}:$BUILD_NUMBER$tag"
   podTemplate(inheritFrom: 'podman') {
     node(POD_LABEL) {
       container('main') {
-        body.call()
         sh "podman build -t $IMAGE -f $dockerfile"
         sh "podman push $IMAGE"
       }
