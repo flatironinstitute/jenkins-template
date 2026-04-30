@@ -19,7 +19,7 @@ pipeline {
         }
         stage('cuda') {
           steps {
-            buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda') {
+            buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda', gpus: 1) {
               sh 'nproc'
               sh 'nvidia-smi'
             }
