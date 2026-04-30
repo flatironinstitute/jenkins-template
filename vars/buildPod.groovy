@@ -10,8 +10,10 @@ def call(Map args, Closure body) {
 
   podTemplate(inheritFrom: 'podman', showRawYaml: false) {
     node(POD_LABEL) {
-      container('main') {
+      container('jnlp') {
         checkout scm
+      }
+      container('main') {
         sh "podman build -t $image -f $dockerfile $context"
         sh "podman push $image"
       }
@@ -24,7 +26,7 @@ def call(Map args, Closure body) {
       imagePullSecrets:
         - name: registry-auth
       nodeSelector:
-        nvidia: ${gpuType}
+        ${gpuType ? "nvidia: $gpuType" : ""}
       containers:
         - name: main
           image: $image
@@ -40,8 +42,10 @@ def call(Map args, Closure body) {
               nvidia.com/gpu: ${gpus}
     """) {
     node(POD_LABEL) {
-      container('main') {
+      container('jnlp') {
         checkout scm
+      }
+      container('main') {
         body.call()
       }
     }
