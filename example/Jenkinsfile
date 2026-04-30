@@ -5,21 +5,25 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '8', daysToKeepStr: '20'))
     timeout(time: 1, unit: 'HOURS')
   }
-  parallel {
-    stage('cpu') {
-      steps {
-        buildPod(context: 'example') {
-          sh 'nproc'
-          sh 'g++ -v'
-          sh 'pip3 -V'
+  stages {
+    stage('main') {
+      parallel {
+        stage('cpu') {
+          steps {
+            buildPod(context: 'example') {
+              sh 'nproc'
+              sh 'g++ -v'
+              sh 'pip3 -V'
+            }
+          }
         }
-      }
-    }
-    stage('cuda') {
-      steps {
-        buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda') {
-          sh 'nproc'
-          sh 'nvidia-smi'
+        stage('cuda') {
+          steps {
+            buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda') {
+              sh 'nproc'
+              sh 'nvidia-smi'
+            }
+          }
         }
       }
     }
