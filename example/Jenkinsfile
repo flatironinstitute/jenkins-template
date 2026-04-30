@@ -4,20 +4,19 @@ properties([
 ])
 
 timeout(time: 1, unit: 'HOURS') {
-  parallel
-    cpu: {
+  parallel cpu: {
       buildPod(context: 'example') {
         sh 'nproc'
         sh 'g++ -v'
         sh 'pip3 -V'
       }
-    },
-    cuda: {
-      buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda', gpus: 1) {
-        sh 'nproc'
-        sh 'nvidia-smi'
-      }
+  },
+  cuda: {
+    buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda', gpus: 1) {
+      sh 'nproc'
+      sh 'nvidia-smi'
     }
+  }
 }
 /* declarative:
 pipeline {
