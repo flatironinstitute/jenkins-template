@@ -10,9 +10,7 @@ def call(Map args, Closure body) {
 
   podTemplate(inheritFrom: 'podman', showRawYaml: false) {
     node(POD_LABEL) {
-      container('jnlp') {
-        checkout scm
-      }
+      checkout scm
       container('main') {
         sh "podman build -t $image -f $context/$dockerfile $context"
         sh "podman push $image"
@@ -42,9 +40,7 @@ def call(Map args, Closure body) {
               nvidia.com/gpu: ${gpus}
     """) {
     node(POD_LABEL) {
-      container('jnlp') {
-        checkout scm
-      }
+      checkout scm
       container('main') {
         body.call()
       }
