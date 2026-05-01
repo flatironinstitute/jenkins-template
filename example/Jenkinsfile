@@ -3,24 +3,29 @@ properties([
   buildDiscarder(logRotator(numToKeepStr: '10', daysToKeepStr: '30'))
 ])
 
-timeout(time: 1, unit: 'HOURS') {
-  parallel cpu: {
-    buildPod(context: 'example') {
-      stage('cpu') {
-        sh 'nproc'
-        sh 'g++ -v'
-        sh 'pip3 -V'
+try {
+  timeout(time: 1, unit: 'HOURS') {
+    parallel cpu: {
+      buildPod(context: 'example') {
+        stage('cpu') {
+          sh 'nproc'
+          sh 'g++ -v'
+          sh 'pip3 -V'
+        }
       }
-    }
-  },
-  cuda: {
-    buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda', gpus: 1) {
-      stage('cuda') {
-        sh 'nproc'
-        sh 'nvidia-smi'
+    },
+    cuda: {
+      buildPod(context: 'example', dockerfile: 'Dockerfile-cuda', tag: 'cuda', gpus: 1) {
+        stage('cuda') {
+          sh 'nproc'
+          sh 'nvidia-smi'
+        }
       }
     }
   }
+}
+finally {
+  emailFailure()
 }
 
 /* declarative:
@@ -52,6 +57,11 @@ pipeline {
           }
         }
       }
+    }
+  }
+  post {
+    failure {
+      emailFailure()
     }
   }
 } */
