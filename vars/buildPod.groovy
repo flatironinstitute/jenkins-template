@@ -38,6 +38,9 @@ def call(Map args, Closure body) {
               cpu: ${cpus}
               memory: ${memory}
               nvidia.com/gpu: ${gpus}
+          env:
+          - name: PARALLEL
+            value: ${cpus}
     """) {
     node(POD_LABEL) {
       checkout scm
