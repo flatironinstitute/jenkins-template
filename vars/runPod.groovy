@@ -3,7 +3,7 @@ def call(Map args, Closure body) {
   def memory     = args.memory ?: "16Gi";
   def gpus       = args.gpus ?: 0;
   def gpuType    = args.gpuType;
-  String image = imageName(args.tag ?: "")
+  def image      = args.image ?: imageName(args.tag ?: "");
 
   podTemplate(inheritFrom: 'jnlp', yaml: """
     spec:
