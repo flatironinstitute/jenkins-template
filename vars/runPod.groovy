@@ -3,15 +3,42 @@ def call(Map args, Closure body) {
   def memory     = args.memory ?: "16Gi";
   def gpus       = args.gpus ?: 0;
   def gpuType    = args.gpuType;
+  def devShm     = args.devShm ?: false;
   def image      = args.image ?: imageName(args.tag ?: "");
+
+  String podExtra = "";
+  String containerExtra = "";
+
+  if (gpus) {
+    podExtra += """
+      runtimeClassName: nvidia
+    """;
+    if (gpuType) {
+      podExtra += """
+      nodeSelector:
+        nvidia: $gpuType
+      """;
+    }
+  }
+  if (devShm) {
+    podExtra += """
+      volumes:
+        - name: devshm
+          emptyDir:
+            medium: Memory
+    """;
+    containerExtra += """
+          volumeMounts:
+            - name: devshm
+              mountPath: /dev/shm
+    """;
+  }
 
   podTemplate(inheritFrom: 'jnlp', yaml: """
     spec:
-      runtimeClassName: ${gpus > 0 ? "nvidia" : ""}
       imagePullSecrets:
         - name: registry-auth
-      nodeSelector:
-        ${gpuType ? "nvidia: $gpuType" : ""}
+      ${podExtra}
       containers:
         - name: main
           image: $image
@@ -28,6 +55,7 @@ def call(Map args, Closure body) {
           env:
           - name: PARALLEL
             value: ${cpus}
+          ${containerExtra}
     """) {
     node(POD_LABEL) {
       checkout scm
