@@ -4,7 +4,7 @@ def call(Map args, Closure body) {
   def gpus       = args.gpus ?: 0;
   def gpuType    = args.gpuType;
   def devShm     = args.devShm ?: false;
-  def image      = args.image ?: imageName(args.tag ?: "");
+  def image      = args.image ?: imageName(args.tag ?: "latest");
 
   String podExtra = "";
   String containerExtra = "";

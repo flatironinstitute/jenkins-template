@@ -3,7 +3,7 @@ def call(Map args) {
   def dockerfile = args.dockerfile ?: "Dockerfile";
   def buildArgs  = args.buildArgs ?: "";
   def prep       = args.prep;
-  String image = imageName(args.tag ?: "")
+  String image = imageName(args.tag ?: "latest")
 
   podTemplate(inheritFrom: 'podman', showRawYaml: false) {
     node(POD_LABEL) {
