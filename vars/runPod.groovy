@@ -42,6 +42,7 @@ def call(Map args, Closure body) {
       containers:
         - name: main
           image: $image
+          imagePullPolicy: Always
           command: [sleep]
           args: [99999]
           securityContext:
