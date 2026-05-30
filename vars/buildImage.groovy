@@ -9,8 +9,11 @@ def call(Map args) {
     node(POD_LABEL) {
       checkout scm
       container('main') {
-        if (prep)
-           prep.call()
+        if (prep) {
+          def extra = prep.call()
+          if (extra)
+            buildArgs += " $extra"
+        }
         sh "podman build -t $image -f $context/$dockerfile $buildArgs $context"
         sh "podman push $image"
       }
