@@ -4,6 +4,7 @@ def call(Map args, Closure body) {
   def gpus       = args.gpus ?: 0;
   def gpuType    = args.gpuType;
   def devShm     = args.devShm ?: false;
+  def mounts     = args.mounts ?: [:]
   def image      = args.image ?: imageName(args.tag ?: "latest");
 
   def spec = [
@@ -26,21 +27,32 @@ def call(Map args, Closure body) {
         'name': 'PARALLEL',
         'value': cpus]],
       'volumeMounts': []]]]
-        
+
   if (gpus) {
     spec['runtimeClassName'] = 'nvidia'
     if (gpuType) {
       spec['nodeSelector'] = ['nvidia': gpuType]
     }
   }
+
   if (devShm) {
-    spec['volumes'] += [[
+    spec['volumes'] << [
       'name': 'devshm',
       'emptyDir': [
-        'medium': 'Memory']]]
-    spec['containers'][0]['volumeMounts'] += [[
+        'medium': 'Memory']]
+    spec['containers'][0]['volumeMounts'] << [
       'name': 'devshm',
-      'mountPath': '/dev/shm']]
+      'mountPath': '/dev/shm']
+  }
+
+  mounts.each { pvc, path ->
+    spec['volumes'] << [
+      'name': pvc,
+      'persistentVolumeClaim': [
+        'claimName': pvc]]
+    spec['containers'][0]['volumeMounts'] << [
+      'name': pvc,
+      'mountPath': path]
   }
 
   def yaml = writeYaml(returnText: true, data: ['spec': spec])
@@ -53,4 +65,3 @@ def call(Map args, Closure body) {
     }
   }
 }
-
