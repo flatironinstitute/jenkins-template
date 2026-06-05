@@ -3,7 +3,7 @@ properties([
   buildDiscarder(logRotator(numToKeepStr: '10', daysToKeepStr: '30'))
 ])
 
-try {
+catchError {
   timeout(time: 1, unit: 'HOURS') {
     parallel cpu: {
       buildPod(context: 'example') {
@@ -24,9 +24,7 @@ try {
     }
   }
 }
-finally {
-  emailFailure()
-}
+emailFailure()
 
 /* declarative:
 pipeline {
@@ -60,7 +58,7 @@ pipeline {
     }
   }
   post {
-    failure {
+    always {
       emailFailure()
     }
   }
